@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Nexus Premium Edition</title>
+    
+    <!-- ПОДКЛЮЧАЕМ ТОПОВЫЕ ШРИФТЫ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #05060a;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        /* --- ГЛАВНОЕ МЕНЮ (КИБЕРСПОРТИВНЫЙ СТИЛЬ) --- */
+        #main-menu {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 119, 255, 0.08) 0%, transparent 45%),
+                #070913;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.4s ease, visibility 0.4s;
+        }
+
+        /* Эффектная стеклянная карточка */
+        .menu-card {
+            background: rgba(13, 17, 28, 0.45);
+            padding: 45px 40px;
+            border-radius: 32px;
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            box-shadow: 
+                0 30px 70px rgba(0, 0, 0, 0.8),
+                inset 0 0 30px rgba(0, 255, 204, 0.02);
+            width: 420px;
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -50%;
+            width: 200%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.03), transparent);
+            transform: skewX(-30deg);
+            pointer-events: none;
+        }
+
+        /* Стильный футуристичный логотип */
+        .menu-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 46px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #00ffcc 0%, #0077ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.3));
+        }
+
+        .setting-group {
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #475569;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        select {
+            width: 100%;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 16px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        select:hover {
+            border-color: rgba(0, 255, 204, 0.4);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        select:focus { 
+            border-color: #00ffcc; 
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.25);
+        }
+
+        /* Кнопка играть */
+        .btn-play {
+            font-family: 'Orbitron', sans-serif;
+            width: 100%;
+            padding: 18px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #00ffcc 0%, #00a8ff 100%);
+            border: none;
+            color: #04060a;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .btn-play:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.6);
+            filter: brightness(1.1);
+        }
+
+        /* --- ЭКРАН ЗАГРУЗКИ --- */
+        #loading-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #040508;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+
+        .brand-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00ffcc, #0055ff);
+            clip-path: polygon(0% 100%, 100% 100%, 100% 40%, 80% 60%, 50% 20%, 20% 60%, 0% 40%);
+            animation: pulse 1.8s infinite alternate;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: #fff;
+            text-shadow: 0 0 25px rgba(0, 255, 204, 0.4);
+        }
+
+        .loader-bar {
+            width: 220px;
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            margin-top: 35px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffcc, #00a8ff);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(0,255,204,0.3)); }
+            100% { transform: scale(1.06); filter: drop-shadow(0 0 25px rgba(0,255,204,0.7)); }
+        }
+
+        /* --- ИГРОВОЙ ЭКРАН --- */
+        #game-screen {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: #06070d;
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 25px;
+            left: 40px; /* Сместил левее, чтобы не мешать кнопке меню */
+            background: rgba(15, 23, 42, 0.6);
+            padding: 14px 35px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        #turn-status { color: #00ffcc; }
+
+        /* ИЗМЕНЕННАЯ КНОПКА МЕНЮ: СВЕРХУ, ДЛИННАЯ И ЗАМЕТНАЯ */
+        .btn-trigger-menu {
+            font-family: 'Orbitron', sans-serif;
+            position: absolute;
+            top: 25px;
+            right: 40px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            width: 180px; /* Сделал длинной */
+            padding: 14px 0;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .btn-trigger-menu:hover { 
+            background: #ef4444; 
+            color: #fff; 
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+            transform: scale(1.03);
+        }
+
+        #board-container {
+            box-shadow: 0 40px 110px rgba(0,0,0,0.9);
+            border: 10px solid #0f172a;
+            border-radius: 12px;
+            background: #0f172a;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #chessboard {
+            display: grid;
+            grid-template-columns: repeat(8, min(10.2vh, 10.2vw));
+            grid-template-rows: repeat(8, min(10.2vh, 10.2vw));
+        }
+
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        /* ТЕМЫ ОФОРМЛЕНИЯ ДОСКИ */
+        .theme-classic .light { background-color: #cbd5e1; }
+        .theme-classic .dark { background-color: #475569; }
+        
+        .theme-emerald .light { background-color: #e2e8f0; }
+        .theme-emerald .dark { background-color: #1e5e2f; }
+
+        .theme-chocolate .light { background-color: #edd6b1; }
+        .theme-chocolate .dark { background-color: #693613; }
+
+        /* Состояния клеток */
+        .cell.selected { background-color: #0284c7 !important; }
+        .cell.last-move-src { background-color: rgba(245, 158, 11, 0.4) !important; }
+        .cell.last-move-dst { background-color: rgba(245, 158, 11, 0.65) !important; }
+        
+        .cell.hint::after {
+            content: '';
+            width: 26%;
+            height: 26%;
+            background-color: #10b981;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .cell.hint.has-piece::after {
+            width: 82%;
+            height: 82%;
+            border: 5px solid #ef4444;
+            background: transparent;
+            border-radius: 50%;
+        }
+
+        .piece {
+            font-size: min(7.5vh, 7.5vw);
+            z-index: 3;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .white-piece {
+            color: #ffffff;
+            filter: drop-shadow(0px 0px 2px #000) drop-shadow(2px 4px 6px rgba(0,0,0,0.5));
+        }
+
+        .black-piece {
+            color: #12141c;
+            filter: drop-shadow(0px 0px 2px #fff) drop-shadow(2px 4px 6px rgba(0,0,0,0.7));
+        }
+
+        .flipped .piece { transform: rotate(180deg); }
+
+        /* --- ВСПЛЫВАЮЩЕЕ ОКНО ПАУЗЫ --- */
+        #pause-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(4, 5, 8, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 150;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #pause-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .pause-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            border-radius: 24px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #pause-overlay.active .pause-card {
+            transform: scale(1);
+        }
+
+        .pause-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            color: #f3f4f6;
+        }
+
+        .pause-btn {
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pause-btn.primary {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+        .pause-btn.primary:hover { background: #059669; transform: translateY(-1px); }
+
+        .pause-btn.secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e5e7eb;
+        }
+        .pause-btn.secondary:hover { background: rgba(255,255,255,0.12); }
+
+        .pause-btn.danger {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+        .pause-btn.danger:hover { background: #dc2626; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+    <!-- Главное меню -->
+    <div id="main-menu">
+        <div class="menu-card">
+            <div class="menu-logo">CHESS NEXUS</div>
+            
+            <div class="setting-group">
+                <label>Режим Игры</label>
+                <select id="game-mode" onchange="toggleDifficultyVisibility()">
+                    <option value="bot">Против Компьютера (ИИ)</option>
+                    <option value="pvp">1 против 1 (Вдвоем)</option>
+                </select>
+            </div>
+
+            <div class="setting-group" id="diff-box">
+                <label>Сложность Бота</label>
+                <select id="difficulty">
+                    <option value="1">Уровень 1 — Новичок</option>
+                    <option value="2">Уровень 2 — Слабый</option>
+                    <option value="3" selected>Уровень 3 — Средний</option>
+                    <option value="4">Уровень 4 — Мастер</option>
+                    <option value="5">Уровень 5 — Гроссмейстер</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label>Цвет Шахматной Доски</label>
+                <select id="board-theme">
+                    <option value="classic">Классический (Стальной)</option>
+                    <option value="emerald">Изумрудный (Зеленый)</option>
+                    <option value="chocolate">Шоколадный (Дерево)</option>
+                </select>
+            </div>
+
+            <button class="btn-play" onclick="startLoading()">ИГРАТЬ</button>
+        </div>
+    </div>
+
+    <!-- Экран загрузки -->
+    <div id="loading-screen">
+        <div class="brand-logo">
+            <div class="logo-icon"></div>
+            <div class="logo-text">CHESS NEXUS</div>
+        </div>
+        <div class="loader-bar">
+            <div class="loader-progress" id="progress"></div>
+        </div>
+    </div>
+
+    <!-- Игровой экран -->
+    <div id="game-screen">
+        <div id="info-panel">
+            <span id="turn-status">Ход Белых</span>
+        </div>
+
+        <!-- ДЛИННАЯ И ЗАМЕТНАЯ КНОПКА МЕНЮ СВЕРХУ -->
+        <button class="btn-trigger-menu" onclick="openPauseMenu()">МЕНЮ</button>
+
+        <div id="board-container">
+            <div id="chessboard"></div>
+        </div>
+    </div>
+
+    <!-- ОВЕРЛЕЙ ПАУЗЫ -->
+    <div id="pause-overlay">
+        <div class="pause-card">
+            <div class="pause-title">ПАУЗА</div>
+            <button class="pause-btn primary" onclick="closePauseMenu()">Продолжить</button>
+            <button class="pause-btn secondary" onclick="restartGame()">Заново</button>
+            <button class="pause-btn danger" onclick="exitToMenu()">Главное меню</button>
+        </div>
+    </div>
+
+    <script>
+        const mainMenu = document.getElementById('main-menu');
+        const loadingScreen = document.getElementById('loading-screen');
+        const loaderProgress = document.getElementById('progress');
+        const boardElement = document.getElementById('chessboard');
+        const boardContainer = document.getElementById('board-container');
+        const turnStatus = document.getElementById('turn-status');
+        const gameModeSelect = document.getElementById('game-mode');
+        const diffBox = document.getElementById('diff-box');
+        const difficultySelect = document.getElementById('difficulty');
+        const boardThemeSelect = document.getElementById('board-theme');
+        const pauseOverlay = document.getElementById('pause-overlay');
+
+        const PIECES = {
+            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+        };
+
+        const PIECE_VALUES = {
+            'p': 10, 'r': 50, 'n': 30, 'b': 30, 'q': 90, 'k': 9000,
+            'P': -10, 'R': -50, 'N': -30, 'B': -30, 'Q': -90, 'K': -9000
+        };
+
+        let board = [];
+        let selectedCell = null;
+        let validMoves = [];
+        let isWhiteTurn = true;
+        let gameActive = false;
+        let lastMove = null;
+
+        function toggleDifficultyVisibility() {
+            diffBox.style.display = gameModeSelect.value === 'pvp' ? 'none' : 'block';
+        }
+
+        function startLoading() {
+            mainMenu.style.opacity = '0';
+            setTimeout(() => {
+                mainMenu.style.visibility = 'hidden';
+                loadingScreen.style.visibility = 'visible';
+                loadingScreen.style.opacity = '1';
+                
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            loadingScreen.style.opacity = '0';
+                            loadingScreen.style.visibility = 'hidden';
+                            initGame();
+                        }, 250);
+                    } else {
+                        width += 5;
+                        loaderProgress.style.width = width + '%';
+                    }
+                }, 25);
+            }, 300);
+        }
+
+        function openPauseMenu() {
+            if (!gameActive) return;
+            pauseOverlay.classList.add('active');
+        }
+
+        function closePauseMenu() {
+            pauseOverlay.classList.remove('active');
+        }
+
+        function restartGame() {
+            closePauseMenu();
+            initGame();
+        }
+
+        function exitToMenu() {
+            closePauseMenu();
+            gameActive = false;
+            loaderProgress.style.width = '0%';
+            mainMenu.style.visibility = 'visible';
+            mainMenu.style.opacity = '1';
+        }
+
+        function initGame() {
+            board = [
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            ];
+            selectedCell = null;
+            validMoves = [];
+            isWhiteTurn = true;
+            gameActive = true;
+            lastMove = null;
+
+            boardContainer.className = ''; 
+            boardContainer.classList.add('theme-' + boardThemeSelect.value);
+            boardContainer.style.transform = 'rotate(0deg)';
+            boardContainer.classList.remove('flipped');
+
+            updateStatusText();
+            renderBoard();
+        }
+
+        function renderBoard() {
+            boardElement.innerHTML = '';
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.classList.add((r + c) % 2 === 0 ? 'light' : 'dark');
+                    
+                    if (lastMove) {
+                        if (lastMove.fromR === r && lastMove.fromC === c) cell.classList.add('last-move-src');
+                        if (lastMove.toR === r && lastMove.toC === c) cell.classList.add('last-move-dst');
+                    }
+
+                    const piece = board[r][c];
+                    if (piece) {
+                        const pieceDiv = document.createElement('div');
+                        pieceDiv.classList.add('piece');
+                        pieceDiv.classList.add(piece === piece.toUpperCase() ? 'white-piece' : 'black-piece');
+                        pieceDiv.innerText = PIECES[piece];
+                        cell.appendChild(pieceDiv);
+                    }
+
+                    if (selectedCell && selectedCell.row === r && selectedCell.col === c) {
+                        cell.classList.add('selected');
+                    }
+
+                    const isHint = validMoves.some(m => m.toR === r && m.toC === c);
+                    if (isHint) {
+                        cell.classList.add('hint');
+                        if (piece) cell.classList.add('has-piece');
+                    }
+
+                    cell.addEventListener('click', () => handleCellClick(r, c));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(r, c) {
+            if (!gameActive || pauseOverlay.classList.contains('active')) return;
+            if (gameModeSelect.value === 'bot' && !isWhiteTurn) return;
+
+            const piece = board[r][c];
+            const move = validMoves.find(m => m.toR === r && m.toC === c);
+
+            if (move) {
+                lastMove = move;
+                executeMove(board, move);
+                selectedCell = null;
+                validMoves = [];
+                isWhiteTurn = !isWhiteTurn;
+
+                if (checkGameOver(board, isWhiteTurn)) {
+                    gameActive = false;
+                    renderBoard();
+                    return;
+                }
+
+                updateStatusText();
+
+                if (gameModeSelect.value === 'pvp') {
+                    if (isWhiteTurn) {
+                        boardContainer.style.transform = 'rotate(0deg)';
+                        boardContainer.classList.remove('flipped');
+                    } else {
+                        boardContainer.style.transform = 'rotate(180deg)';
+                        boardContainer.classList.add('flipped');
+                    }
+                    renderBoard();
+                } else {
+                    renderBoard();
+                    setTimeout(makeBotMove, 400);
+                }
+                return;
+            }
+
+            if (piece && ((isWhiteTurn && piece === piece.toUpperCase()) || (!isWhiteTurn && piece === piece.toLowerCase()))) {
+                selectedCell = { row: r, col: c };
+                validMoves = getSafeMoves(board, r, c, isWhiteTurn);
+                renderBoard();
+            } else {
+                selectedCell = null;
+                validMoves = [];
+                renderBoard();
+            }
+        }
+
+        function executeMove(targetBoard, move) {
+            const piece = targetBoard[move.fromR][move.fromC];
+            targetBoard[move.toR][move.toC] = piece;
+            targetBoard[move.fromR][move.fromC] = '';
+
+            if (piece === 'P' && move.toR === 0) targetBoard[move.toR][move.toC] = 'Q';
+            if (piece === 'p' && move.toR === 7) targetBoard[move.toR][move.toC] = 'q';
+        }
+
+        function getSafeMoves(currentBoard, r, c, isWhite) {
+            const rawMoves = getPiecesMoves(currentBoard, r, c);
+            return rawMoves.filter(move => {
+                const tempBoard = currentBoard.map(row => [...row]);
+                executeMove(tempBoard, move);
+                return !isKingUnderAttack(tempBoard, isWhite);
+            });
+        }
+
+        function isKingUnderAttack(currentBoard, isWhite) {
+            let kingRow = -1, kingCol = -1;
+            const kingChar = isWhite ? 'K' : 'k';
+
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (currentBoard[r][c] === kingChar) { kingRow = r; kingCol = c; break; }
+                }
+            }
+            if (kingRow === -1) return false;
+
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = currentBoard[r][c];
+                    if (piece && (isWhite ? piece === piece.toLowerCase() : piece === piece.toUpperCase())) {
+                        const enemyMoves = getPiecesMoves(currentBoard, r, c);
+                        if (enemyMoves.some(m => m.toR === kingRow && m.toC === kingCol)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function getPiecesMoves(currentBoard, r, c) {
+            const piece = currentBoard[r][c];
+            if (!piece) return [];
+            const moves = [];
+            const isWhite = piece === piece.toUpperCase();
+            const type = piece.toLowerCase();
+
+            const rookDirs = [[1,0], [-1,0], [0,1], [0,-1]];
+            const bishopDirs = [[1,1], [1,-1], [-1,1], [-1,-1]];
+            const knightDirs = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
+            const kingDirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+
+            switch (type) {
+                case 'p':
+                    const dir = isWhite ? -1 : 1;
+                    if (r + dir >= 0 && r + dir < 8 && !currentBoard[r + dir][c]) {
+                        moves.push({ fromR: r, fromC: c, toR: r + dir, toC: c });
+                        if (r === (isWhite ? 6 : 1) && !currentBoard[r + dir * 2][c]) {
+                            moves.push({ fromR: r, fromC: c, toR: r + dir * 2, toC: c });
+                        }
+                    }
+                    [c - 1, c + 1].forEach(ec => {
+                        if (ec >= 0 && ec < 8 && r + dir >= 0 && r + dir < 8) {
+                            const target = currentBoard[r + dir][ec];
+                            if (target && (isWhite ? target === target.toLowerCase() : target === target.toUpperCase())) {
+                                moves.push({ fromR: r, fromC: c, toR: r + dir, toC: ec });
+                            }
+                        }
+                    });
+                    break;
+                case 'r':
+                case 'b':
+                case 'q':
+                    const dirs = type === 'r' ? rookDirs : type === 'b' ? bishopDirs : [...rookDirs, ...bishopDirs];
+                    dirs.forEach(d => {
+                        let s = 1;
+                        while (true) {
+                            const nR = r + d[0] * s; const nC = c + d[1] * s;
+                            if (nR < 0 || nR >= 8 || nC < 0 || nC >= 8) break;
+                            const target = currentBoard[nR][nC];
+                            if (!target) { moves.push({ fromR: r, fromC: c, toR: nR, toC: nC }); }
+                            else {
+                                if (isWhite ? target === target.toLowerCase() : target === target.toUpperCase()) {
+                                    moves.push({ fromR: r, fromC: c, toR: nR, toC: nC });
+                                }
+                                break;
+                            }
+                            s++;
+                        }
+                    });
+                    break;
+                case 'n':
+                    knightDirs.forEach(d => {
+                        const nR = r + d[0]; const nC = c + d[1];
+                        if (nR >= 0 && nR < 8 && nC >= 0 && nC < 8) {
+                            const target = currentBoard[nR][nC];
+                            if (!target || (isWhite ? target === target.toLowerCase() : target === target.toUpperCase())) {
+                                moves.push({ fromR: r, fromC: c, toR: nR, toC: nC });
+                            }
+                        }
+                    });
+                    break;
+                case 'k':
+                    kingDirs.forEach(d => {
+                        const nR = r + d[0]; const nC = c + d[1];
+                        if (nR >= 0 && nR < 8 && nC >= 0 && nC < 8) {
+                            const target = currentBoard[nR][nC];
+                            if (!target || (isWhite ? target === target.toLowerCase() : target === target.toUpperCase())) {
+                                moves.push({ fromR: r, fromC: c, toR: nR, toC: nC });
+                            }
+                        }
+                    });
+                    break;
+            }
+            return moves;
+        }
+
+        function generateAllSafeMoves(currentBoard, isWhite) {
+            const moves = [];
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = currentBoard[r][c];
+                    if (piece && (isWhite ? piece === piece.toUpperCase() : piece === piece.toLowerCase())) {
+                        moves.push(...getSafeMoves(currentBoard, r, c, isWhite));
+                    }
+                }
+            }
+            return moves;
+        }
+
+        function checkGameOver(currentBoard, isWhite) {
+            const moves = generateAllSafeMoves(currentBoard, isWhite);
+            if (moves.length === 0) {
+                if (isKingUnderAttack(currentBoard, isWhite)) {
+                    turnStatus.innerText = `МАТ! Победили ${isWhite ? 'Черные' : 'Белые'}!`;
+                    turnStatus.style.color = "#ff4444";
+                } else {
+                    turnStatus.innerText = "НИЧЬЯ (ПАТ)!";
+                    turnStatus.style.color = "#94a3b8";
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function updateStatusText() {
+            if (!gameActive) return;
+            if (isWhiteTurn) {
+                turnStatus.innerText = "Ход Белых";
+                turnStatus.style.color = "#00ffcc";
+            } else {
+                turnStatus.innerText = gameModeSelect.value === 'pvp' ? "Ход Черных" : "Бот думает...";
+                turnStatus.style.color = "#38bdf8";
+            }
+        }
+
+        function evaluateBoard(currentBoard) {
+            let res = 0;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (currentBoard[r][c]) res += PIECE_VALUES[currentBoard[r][c]];
+                }
+            }
+            return res;
+        }
+
+        function minimax(currentBoard, depth, alpha, beta, isMaximizing) {
+            if (depth === 0) return { score: evaluateBoard(currentBoard) };
+            const moves = generateAllSafeMoves(currentBoard, !isMaximizing);
+            if (moves.length === 0) return { score: isMaximizing ? -90000 : 90000 };
+
+            let bestMove = null;
+            if (isMaximizing) {
+                let maxScore = -Infinity;
+                for (let move of moves) {
+                    const temp = currentBoard.map(row => [...row]);
+                    executeMove(temp, move);
+                    let score = minimax(temp, depth - 1, alpha, beta, false).score;
+                    if (score > maxScore) { maxScore = score; bestMove = move; }
+                    alpha = Math.max(alpha, maxScore);
+                    if (beta <= alpha) break;
+                }
+                return { score: maxScore, move: bestMove };
+            } else {
+                let minScore = Infinity;
+                for (let move of moves) {
+                    const temp = currentBoard.map(row => [...row]);
+                    executeMove(temp, move);
+                    let score = minimax(temp, depth - 1, alpha, beta, true).score;
+                    if (score < minScore) { minScore = score; bestMove = move; }
+                    beta = Math.min(beta, minScore);
+                    if (beta <= alpha) break;
+                }
+                return { score: minScore, move: bestMove };
+            }
+        }
+
+        function makeBotMove() {
+            if (!gameActive) return;
+            const botMoves = generateAllSafeMoves(board, false);
+            if (botMoves.length === 0) { checkGameOver(board, false); return; }
+
+            const level = parseInt(difficultySelect.value);
+            let move = null;
+
+            if (level === 1) move = botMoves[Math.floor(Math.random() * botMoves.length)];
+            else if (level === 2) move = (Math.random() < 0.4) ? botMoves[Math.floor(Math.random() * botMoves.length)] : minimax(board, 1, -Infinity, Infinity, true).move;
+            else if (level === 3) move = minimax(board, 2, -Infinity, Infinity, true).move;
+            else if (level === 4) move = minimax(board, 3, -Infinity, Infinity, true).move;
+            else move = minimax(board, 4, -Infinity, Infinity, true).move;
+
+            if (!move) move = botMoves[0];
+            
+            lastMove = move;
+            executeMove(board, move);
+            isWhiteTurn = true;
+
+            if (!checkGameOver(board, true)) { updateStatusText(); }
+            renderBoard();
+        }
+    </script>
+</body>
+</html>
