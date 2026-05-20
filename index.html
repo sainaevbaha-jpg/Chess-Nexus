@@ -372,6 +372,61 @@
         .pause-btn.primary { background: #10b981; color: white; }
         .pause-btn.secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #e5e7eb; }
         .pause-btn.danger { background: #ef4444; color: white; }
+        /* --- АДАПТИВНОСТЬ --- */
+
+/* Планшеты и телефоны */
+@media (max-width: 900px) {
+    #game-screen {
+        flex-direction: column;
+        gap: 15px;
+        padding: 10px;
+    }
+
+    #board-container {
+        border-width: 5px;
+    }
+
+    /* Уменьшаем размер клеток на маленьких экранах */
+    #chessboard {
+        grid-template-columns: repeat(8, min(11vw, 11vh));
+        grid-template-rows: repeat(8, min(11vw, 11vh));
+    }
+
+    .piece {
+        font-size: min(8vw, 8vh);
+    }
+
+    /* Скрываем боковую панель или переносим её ниже */
+    #ai-control-panel {
+        width: 100%;
+        max-width: 400px;
+        order: 3;
+    }
+
+    .menu-card {
+        width: 90%;
+        padding: 30px 20px;
+    }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 450px) {
+    .menu-logo {
+        font-size: 32px;
+    }
+    
+    #info-panel {
+        position: static;
+        margin-bottom: 10px;
+    }
+
+    .btn-trigger-menu {
+        top: 10px;
+        right: 10px;
+        width: 100px;
+        padding: 10px 0;
+    }
+}
     </style>
 </head>
 <body onclick="insureAudioPlay()"> <!-- Любой клик по экрану будит и перезапускает звук, если он завис -->
